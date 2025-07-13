@@ -1,2 +1,2 @@
-# craft-core
-application:LLM Core
+# yyyoink-pipeline
+application:LLM Processing Pipeline
