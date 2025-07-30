@@ -1,2 +1,2 @@
-# yyyoink-pipeline
-application:LLM Processing Pipeline
+# lark-preprocess
+application:LLM Client Preprocessing
