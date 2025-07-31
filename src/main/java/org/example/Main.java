@@ -1,18 +1,29 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        PromptRawConsumer consumer = new PromptRawConsumer("prompt.raw");
+        PromptCleanProducer producer = new PromptCleanProducer("prompt.clean");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutting down..");
+            consumer.close();
+            producer.close();
+        }));
+
+        System.out.printf("Starting Preprocess..");
+
+        try {
+            while (true) {
+                String processedPrompt = consumer.consumeAndProcess();
+                if (processedPrompt != null) {
+                    producer.produce("new_clean", processedPrompt);
+                }
+
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException err) {
+            System.err.println("Interrupted: " + err.getMessage());
         }
     }
 }
