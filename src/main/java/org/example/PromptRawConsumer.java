@@ -3,18 +3,22 @@ package org.example;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.logging.Logger;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 public class PromptRawConsumer {
 
     private final KafkaConsumer<String, String> consumer;
+    private static final Logger logger = Logger.getLogger(
+        PromptRawConsumer.class.getName()
+    );
 
     public PromptRawConsumer(String topic) {
         System.out.println("Initializing consumer..");
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "lark-llm");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "lark-preprocess");
         props.put(
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
             StringDeserializer.class.getName()
@@ -31,15 +35,19 @@ public class PromptRawConsumer {
 
     public String consumeAndProcess() {
         ConsumerRecords<String, String> records = consumer.poll(
-            Duration.ofMillis(2)
+            Duration.ofMillis(200)
         );
         for (ConsumerRecord<String, String> record : records) {
+            logger.info(
+                "Consumed: key=" + record.key() + ", value=" + record.value()
+            );
             System.out.printf(
-                "Consumed: key=%s, value=%s, offset=%s",
+                "\nConsumed: key=%s, value=%s, offset=%s\n",
                 record.key(),
                 record.value(),
                 record.offset()
             );
+            System.out.flush();
             return record.value();
         }
         return null;
