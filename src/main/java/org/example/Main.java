@@ -1,6 +1,11 @@
 package org.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         PromptRawConsumer consumer = new PromptRawConsumer("prompt.raw");
@@ -8,14 +13,13 @@ public class Main {
 
         Runtime.getRuntime().addShutdownHook(
                 new Thread(() -> {
-                    System.out.println("Shutting down..");
+                    logger.info("Shutting down..");
                     consumer.close();
                     producer.close();
                 })
             );
 
-        System.out.printf("Starting Preprocess..");
-        System.out.flush();
+        logger.info("Starting Preprocess..");
 
         try {
             while (true) {
@@ -27,7 +31,7 @@ public class Main {
                 Thread.sleep(100);
             }
         } catch (InterruptedException err) {
-            System.err.println("Interrupted: " + err.getMessage());
+            logger.error("Interrupted: " + err.getMessage());
         }
     }
 }

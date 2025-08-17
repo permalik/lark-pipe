@@ -3,19 +3,20 @@ package org.example;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
-import java.util.logging.Logger;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PromptRawConsumer {
 
-    private final KafkaConsumer<String, String> consumer;
-    private static final Logger logger = Logger.getLogger(
-        PromptRawConsumer.class.getName()
+    private static final Logger logger = LoggerFactory.getLogger(
+        PromptRawConsumer.class
     );
+    private final KafkaConsumer<String, String> consumer;
 
     public PromptRawConsumer(String topic) {
-        System.out.println("Initializing consumer..");
+        logger.info("Initializing consumer..");
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "lark-preprocess");
@@ -30,7 +31,7 @@ public class PromptRawConsumer {
 
         consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(topic));
-        System.out.println("Subscribed to topic");
+        logger.info("Subscribed to topic");
     }
 
     public String consumeAndProcess() {
@@ -39,15 +40,11 @@ public class PromptRawConsumer {
         );
         for (ConsumerRecord<String, String> record : records) {
             logger.info(
-                "Consumed: key=" + record.key() + ", value=" + record.value()
-            );
-            System.out.printf(
-                "\nConsumed: key=%s, value=%s, offset=%s\n",
+                "Consumed: key={}, value={}, offset={}",
                 record.key(),
                 record.value(),
                 record.offset()
             );
-            System.out.flush();
             return record.value();
         }
         return null;
