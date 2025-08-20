@@ -1,0 +1,12 @@
+services:
+  lark-preprocess:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lark_preprocess
+    ports:
+      - "8001:8001"
+
+networks:
+  lark-network:
+    external: true
