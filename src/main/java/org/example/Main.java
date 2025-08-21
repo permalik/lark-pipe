@@ -1,5 +1,7 @@
 package org.example;
 
+import java.util.Arrays;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,8 +10,15 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        PromptRawConsumer consumer = new PromptRawConsumer("prompt.raw");
-        PromptCleanProducer producer = new PromptCleanProducer("prompt.clean");
+        List<String> consumptionTopics = Arrays.asList(
+            "prompt.raw",
+            "prompt.clean",
+            "inference.result",
+            "feedback.stub",
+            "feedback.submission"
+        );
+        PromptRawConsumer consumer = new PromptRawConsumer(consumptionTopics);
+        PromptCleanProducer producer = new PromptCleanProducer();
 
         Runtime.getRuntime().addShutdownHook(
                 new Thread(() -> {
@@ -23,10 +32,13 @@ public class Main {
 
         try {
             while (true) {
-                String processedPrompt = consumer.consumeAndProcess();
-                if (processedPrompt != null) {
-                    producer.produce("new_clean", processedPrompt);
-                }
+                consumer.consumeAndProcess((topic, key, value) -> {
+                    if ("prompt.raw".equals(topic)) {
+                        producer.produce("bus.prompt.clean", key, value);
+                    } else if ("prompt.clean".equals(topic)) {
+                        producer.produce("bus.inference.request", key, value);
+                    }
+                });
 
                 Thread.sleep(100);
             }

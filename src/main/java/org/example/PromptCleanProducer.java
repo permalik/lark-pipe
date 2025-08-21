@@ -12,10 +12,8 @@ public class PromptCleanProducer {
         PromptCleanProducer.class
     );
     private final KafkaProducer<String, String> producer;
-    private final String topic;
 
-    public PromptCleanProducer(String topic) {
-        this.topic = topic;
+    public PromptCleanProducer() {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(
@@ -30,7 +28,7 @@ public class PromptCleanProducer {
         producer = new KafkaProducer<>(props);
     }
 
-    public void produce(String key, String value) {
+    public void produce(String topic, String key, String value) {
         ProducerRecord<String, String> record = new ProducerRecord<>(
             topic,
             key,
@@ -44,7 +42,7 @@ public class PromptCleanProducer {
                     metadata.partition()
                 );
             } else {
-                exception.printStackTrace();
+                logger.error("Failed produce:", exception);
             }
         });
     }

@@ -1,7 +1,7 @@
 package org.example;
 
 import java.time.Duration;
-import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -15,7 +15,7 @@ public class PromptRawConsumer {
     );
     private final KafkaConsumer<String, String> consumer;
 
-    public PromptRawConsumer(String topic) {
+    public PromptRawConsumer(List<String> topics) {
         logger.info("Initializing consumer..");
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -30,11 +30,15 @@ public class PromptRawConsumer {
         );
 
         consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Collections.singletonList(topic));
-        logger.info("Subscribed to topic");
+        consumer.subscribe(topics);
+        logger.info("Subscribed to topics: {}", topics);
     }
 
-    public String consumeAndProcess() {
+    public interface RecordHandler {
+        void handle(String topic, String key, String value);
+    }
+
+    public String consumeAndProcess(RecordHandler handler) {
         ConsumerRecords<String, String> records = consumer.poll(
             Duration.ofMillis(200)
         );
@@ -45,7 +49,7 @@ public class PromptRawConsumer {
                 record.value(),
                 record.offset()
             );
-            return record.value();
+            handler.handle(record.topic(), record.key(), record.value());
         }
         return null;
     }
