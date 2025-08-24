@@ -1,9 +1,9 @@
 services:
-  lark-preprocess:
+  lark-pipeline:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: lark_preprocess
+    container_name: lark_pipeline
     ports:
       - "8001:8001"
 
