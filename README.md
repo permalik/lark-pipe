@@ -1,2 +1,2 @@
-# lark-pipeline
-application:LLM Client Preprocessing
+# lark-pipe
+application:LLM Client Processing Pipeline
