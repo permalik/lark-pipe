@@ -20,10 +20,10 @@ public class Main {
                 })
             );
 
-        logger.info("Starting Preprocess..");
+        logger.info("Starting pipe..");
 
         try {
-            while (true) {
+            do {
                 consumer.consumeAndProcess((key, value) -> {
                     producer.produce("saga.in", key, value);
                     // producer.produce("write", key, value);
@@ -31,7 +31,7 @@ public class Main {
                 });
 
                 Thread.sleep(100);
-            }
+            } while (true);
         } catch (InterruptedException err) {
             logger.error("Interrupted: " + err.getMessage());
         }
