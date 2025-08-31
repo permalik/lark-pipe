@@ -19,7 +19,7 @@ public class PromptRawConsumer {
         logger.info("Initializing consumer..");
         Properties props = new Properties();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "lark-preprocess");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "lark-pipe");
         props.put(
             ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
             StringDeserializer.class.getName()
